@@ -1,0 +1,70 @@
+<!-- login.component.html -->
+<div class="absolute w-full">
+  <div class="flex justify-between items-center mt-2 px-8">
+    <a routerLink="/" class="flex flex-row justify-center items-center gap-2 px-5 py-0.5 text-white btn-back">
+      <div class="text-sm">Go back</div>
+    </a>
+  </div>
+</div>
+<div class="flex justify-center items-center h-screen"
+  style="background-image: url('/assets/img/fondo-transformed.png'); background-repeat: no-repeat; background-size: cover;">
+  <div class="relative px-20 pt-10 pb-5">
+    <!-- Box elements -->
+    <div class="top-2 left-7 z-10 absolute box-1"></div>
+    <div class="top-5 left-10 absolute box-2"></div>
+    <div class="top-[15rem] right-2 absolute box-3"></div>
+    <div class="top-[19rem] right-[4.8rem] z-10 absolute box-4"></div>
+    <div class="top-[27rem] left-[2rem] absolute box-5"></div>
+
+    <div class="bg-white px-10 py-5 rounded-md">
+      <h2 class="py-5 font-semibold text-gray-400 text-2xl text-center">Sign in</h2>
+      <form (submit)="login()" class="flex flex-col justify-center items-center gap-8">
+
+        <div class="relative">
+          <fa-icon [icon]="faEnvelope" class="top-2.5 left-4 absolute text-blue-400"></fa-icon>
+          <input type="email" [(ngModel)]="user.email" name="email" placeholder="Email" required
+            class="px-10 py-2 border border-gray-200 focus:border-blue-300 rounded-lg focus:outline-none" />
+        </div>
+
+        <div class="relative">
+          <fa-icon [icon]="faLock" class="top-2.5 left-4 absolute text-blue-400"></fa-icon>
+          <input [type]="passwordVisible ? 'text' : 'password'" [(ngModel)]="user.password" name="password"
+            placeholder="Password" required
+            class="px-10 py-2 border border-gray-200 focus:border-blue-300 rounded-lg focus:outline-none" />
+          <fa-icon [icon]="passwordVisible ? faEyeSlash : faEye" (click)="togglePasswordVisibility()"
+            class="top-2.5 right-4 absolute text-blue-400 hover:cursor-pointer"></fa-icon>
+        </div>
+
+        <div class="flex justify-start items-center w-full">
+          <div class="text-blue-500 text-sm">Forgot your password?</div>
+        </div>
+
+        <button type="submit" class="bg-blue-400 hover:bg-blue-500 px-10 py-2 rounded-lg w-full text-white"
+          [disabled]="isLoading">
+          {{ isLoading ? 'Cargando...' : 'Login' }}
+        </button>
+        <p *ngIf="errorMessage" class="text-red-500">{{ errorMessage }}</p>
+      </form>
+      <div class="flex justify-center items-center my-4">
+        <div class="flex-grow border-gray-300 border-t"></div>
+        <span class="px-4 text-gray-500">or</span>
+        <div class="flex-grow border-gray-300 border-t"></div>
+      </div>
+      <!-- <div class="flex flex-wrap justify-between px-4">
+        <div class="flex justify-center items-center p-2 border border-gray-300 rounded-full w-12 h-12">
+          <img src="/assets/img/google.jpg" alt="google" />
+        </div>
+        <div class="flex justify-center items-center p-2 border border-gray-300 rounded-full w-12 h-12">
+          <img src="/assets/img/microsoft.jpg" alt="microsoft" />
+        </div>
+        <div class="flex justify-center items-center p-2 border border-gray-300 rounded-full w-12 h-12">
+          <img src="/assets/img/facebook.png" alt="facebook" />
+        </div>
+      </div> -->
+      <div class="flex justify-between items-center pt-12 w-full">
+        <div class="text-gray-400 text-xs">Don't have an account yet?</div>
+        <a routerLink="/register"  class="font-bold text-blue-500 text-sm">Register</a>
+      </div>
+    </div>
+  </div>
+</div>

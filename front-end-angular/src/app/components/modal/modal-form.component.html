@@ -1,0 +1,20 @@
+<div *ngIf="isOpen" class="top-0 left-0 z-[1055] fixed flex bg-gray-800/50 w-full h-full" [ngClass]="{
+      'justify-center items-center': position === 'center',
+      'justify-end items-start': position !== 'center'
+    }" (click)="handleClose($event)">
+
+    <div class="relative bg-white shadow-lg p-4 w-[30rem] max-h-[100vh] overflow-auto transition duration-300 ease-out transform"
+        (click)="$event.stopPropagation()" [ngClass]="{
+      'scale-0 rounded-2xl': !animateOpen && position === 'center',
+      'scale-100 rounded-lg': animateOpen && position === 'center',
+      'translate-x-full': !animateOpen && position !== 'center',
+      'translate-x-0': animateOpen && position !== 'center'
+    }" [style.height]="position === 'center' ? 'auto' : '100%'">
+        <!-- Botón de cerrar -->
+        <button (click)="closeModal()" class="top-2 right-2 absolute text-red-600 hover:text-red-800">
+            <fa-icon [icon]="icons.times" size="lg"></fa-icon>
+        </button>
+
+        <ng-content></ng-content>
+    </div>
+</div>

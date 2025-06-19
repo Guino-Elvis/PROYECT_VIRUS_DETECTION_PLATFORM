@@ -1,0 +1,42 @@
+<div class="flex flex-col gap-2 pt-2"
+    [ngClass]="{'justify-center items-center': isCompact, 'justify-start px-2': !isCompact}">
+    <ng-container *ngFor="let link of links">
+        <!-- Si tiene submenú -->
+        <div class="relative">
+            <button 
+            *ngIf="link.submenu" 
+            class="flex items-center gap-2 hover:bg-gray-200 p-2 rounded-lg w-full transition-all"
+            [ngClass]="{'bg-gray-800 text-white': currentPath === link.route, 'bg-white text-gray-700': currentPath !== link.route, 'justify-center': isCompact}"
+            (click)="toggleSubmenu(link, $event)">
+            
+            <i [class]="getIcon(link.icon, currentPath === link.route)" class="flex justify-center items-center text-xl"></i>
+            <span *ngIf="!isCompact">{{ link.name }}</span>
+            <i class="flex justify-center items-center ml-auto text-md ph-caret-down ph" *ngIf="!isCompact"></i>
+          </button>
+
+            <!-- Submenú flotante -->
+            <div *ngIf="link.showSubmenu" 
+            class="z-50 fixed bg-white shadow-lg py-2 rounded-lg w-48"
+            [style.top.px]="submenuPosition.top"
+            [style.left.px]="submenuPosition.left">
+                <a *ngFor="let subItem of link.submenu" [routerLink]="subItem.route"
+                    class="flex items-center gap-2 hover:bg-gray-200 px-4 py-2 rounded-lg transition-all"
+                    [ngClass]="{'bg-gray-800 text-white': currentPath === subItem.route, 'bg-white text-gray-700': currentPath !== subItem.route}">
+
+                    <i [class]="getIcon(subItem.icon, currentPath === subItem.route)" class="flex justify-center items-center text-xl"></i>
+                    <span>{{ subItem.name }}</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Si es un enlace simple -->
+        <a *ngIf="!link.submenu" [routerLink]="link.route"
+            class="flex items-center gap-2 hover:bg-gray-200 p-2 rounded-lg transition-all"
+            [ngClass]="{'bg-gray-800 text-white': currentPath === link.route, 'bg-white text-gray-700': currentPath !== link.route, 'justify-center': isCompact}">
+
+            <i [class]="getIcon(link.icon, currentPath === link.route)"
+                class="flex justify-center items-center text-xl"></i>
+            <span *ngIf="!isCompact">{{ link.name }}</span>
+        </a>
+    </ng-container>
+</div>

@@ -1,0 +1,25 @@
+<div class="flex items-center gap-2">
+  <!-- Fecha Inicio -->
+  <div class="flex items-center px-2 border border-gray-300 rounded">
+    <label for="startDate" class="sr-only">Fecha Inicio</label>
+    <input 
+      id="startDate"
+      type="date"
+      [(ngModel)]="startDate"
+      (change)="emitDates()"
+      placeholder="Fecha Inicio"
+      class="bg-transparent py-[0.7000rem] outline-none w-[130px] text-gray-700 text-xs">
+  </div>
+
+  <!-- Fecha Fin -->
+  <div class="flex items-center px-2 border border-gray-300 rounded">
+    <label for="endDate" class="sr-only">Fecha Fin</label>
+    <input 
+      id="endDate"
+      type="date"
+      [(ngModel)]="endDate"
+      (change)="emitDates()"
+      placeholder="Fecha Fin"
+      class="bg-transparent py-[0.7000rem] outline-none w-[130px] text-gray-700 text-xs">
+  </div>
+</div>

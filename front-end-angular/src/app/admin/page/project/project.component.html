@@ -1,0 +1,146 @@
+<app-layout title="Project">
+    <app-custom-link icon="ph-file" texto="Project"></app-custom-link>
+
+    <div class="flex justify-center items-center bg-white my-10 px-4 py-4 rounded-md w-auto h-auto">
+        <div class="flex flex-col gap-4 w-full">
+            <app-modal-form [isOpen]="modalOpen" (onClose)="modalOpen = false">
+
+                <app-project-form [project]="editMode ? projectForm : null" (onSave)="saveProject($event)"
+                    (onClose)="closeModal()"></app-project-form>
+            </app-modal-form>
+
+            <div class="flex flex-wrap-reverse justify-between gap-2">
+                <div class="flex flex-wrap-reverse justify-center items-center gap-4">
+                    <div class="relative flex items-center">
+                        <fa-icon [icon]="icons.search " class="left-3 absolute text-gray-400"></fa-icon>
+                        <input
+                            class="bg-transparent py-[0.4800rem] pr-5 pl-10 border border-gray-300 rounded-lg focus-visible:outline-none text-black placeholder-gray-400"
+                            [(ngModel)]="searchText" (input)="filterProjects()" placeholder="Buscar por nombre">
+                    </div>
+                    <div
+                        class="flex flex-row flex-wrap md:flex-nowrap lg:flex-nowrap xl:flex-nowrap justify-start items-start gap-2">
+                        <app-reusable-button [icon]="sortOrder === 'asc' ? icons.arrowDown19 : icons.arrowUp91" text=""
+                            variante="outlined" size="xl" (onClick)="toggleSortOrder()">
+                        </app-reusable-button>
+                        <app-reusable-button [icon]="icons.rotate" text="" variante="outlined" size="xl"
+                            (onClick)="resetFilters()">
+                        </app-reusable-button>
+                        <app-custom-datepicker (dateChange)="updateDates($event)"></app-custom-datepicker>
+                    </div>
+                </div>
+                <app-reusable-button [icon]="icons.add" text="Crear" variante="contained" size="lg"
+                    (onClick)="createProject()">
+                </app-reusable-button>
+            </div>
+
+            <div style="display: block; opacity: 1; transition: opacity 0.5s;"
+                class="rounded-lg min-h-[15rem] max-h-[30rem] overflow-x-auto overflow-y-auto md:hover:overflow-y-auto md:overflow-y-hidden lg:hover:overflow-y-auto lg:overflow-y-hidden">
+                <div *ngIf="projects.length === 0" class="flex justify-center items-center w-full">
+                    <app-no-item-page />
+                </div>
+
+                <div [ngClass]="{ 
+                    'gap-4 grid grid-cols-1 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1': comprimirItems, 
+                    '': !comprimirItems, 
+                  }">
+
+
+                    <div [ngClass]="{ 
+                        'col-span-1': comprimirItems, 
+                        '': !comprimirItems, 
+                      }">
+
+                        <div [ngClass]="{ 
+                            ' gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 xl:grid-cols-2': comprimirItems, 
+                            'sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 xl:grid-cols-4 gap-8': !comprimirItems, 
+                          }" class="grid grid-cols-1 pb-4">
+                            <div *ngFor="let project of projects" class="col-span-1">
+                                <div class="flex flex-row justify-end items-end gap-2 pr-0">
+
+                                    <button
+                                        class="bg-gray-100 hover:bg-[#0061A0] px-4 rounded-t-md text-gray-500 hover:text-white duration-300"
+                                        (click)="detalleProject(project.id!)">
+                                        <fa-icon [icon]="icons.folderPlus"></fa-icon>
+                                    </button>
+                                    <button
+                                        class="bg-gray-100 hover:bg-[#0061A0] px-4 rounded-t-md text-gray-500 hover:text-white duration-300"
+                                        (click)="editProject(project)">
+                                        <fa-icon [icon]="icons.penToSquare"></fa-icon>
+                                    </button>
+                                    <button
+                                        class="bg-gray-100 hover:bg-red-400 px-4 rounded-t-md text-gray-500 hover:text-white duration-300"
+                                        (click)="deleteProject(project.id!)">
+                                        <fa-icon [icon]="icons.trashCan "></fa-icon>
+                                    </button>
+                                </div>
+                                <div
+                                    class="flex flex-col justify-center items-center gap-4 bg-white shadow-md px-4 py-2 rounded-md">
+                                    <div
+                                        class="flex flex-col justify-center items-start bg-[#0061A0] px-2 py-1 rounded-md w-full font-medium text-white">
+                                        <div class="flex justify-between items-center w-full uppercase">
+                                            <div> {{ project?.name }}</div>
+                                        </div>
+                                        <div style="font-size: 11px;" class="text-start">{{ project.company?.ra_social
+                                            }}</div>
+                                    </div>
+                                    <div class="flex justify-start items-center w-full">
+                                        <div
+                                            class="max-w-full overflow-hidden font-bold text-[#283943] text-sm truncate">
+                                            {{ project?.target_url }}
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-row justify-between gap-4 w-full">
+                                        <div class="flex flex-col justify-start items-start">
+                                            <span class="font-bold text-[#283943] uppercase">Creado</span>
+                                            <app-item-updated-at
+                                                [updated_at]="project.created_at ?? null"></app-item-updated-at>
+                                        </div>
+                                        <div class="flex flex-col justify-start items-start">
+                                            <span class="font-bold text-[#283943] uppercase">Actualizado</span>
+                                            <app-item-updated-at
+                                                [updated_at]="project.updated_at ?? null"></app-item-updated-at>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="top-0 z-50 sticky col-span-1" *ngIf="comprimirItems">
+                            <app-project-detalle *ngIf="comprimirItems && idProjectSeleccionada"
+                                [projectId]="idProjectSeleccionada"
+                                (onClose)="comprimirItems = false"></app-project-detalle>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap-reverse justify-between">
+
+                <div
+                    class="flex flex-row items-center gap-2.5 px-2 py-[0.0500rem] border border-gray-300 rounded-md text-gray-500 text-sm">
+                    <label for="itemsPerPage">Mostrar</label>
+                    <select
+                        class="px-3 py-0.5 border border-white focus:border-green-700 focus:border-none rounded-md focus:outline-none text-black 1"
+                        id="itemsPerPage" [(ngModel)]="perPage" (change)="updateItemsPerPage(perPage)">
+                        <option value="1">1</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <label for="itemsPerPage">elementos</label>
+                </div>
+
+                <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (pageChange)="changePage($event)">
+                </app-pagination>
+
+            </div>
+        </div>
+    </div>
+
+
+
+</app-layout>

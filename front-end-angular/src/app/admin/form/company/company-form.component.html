@@ -1,0 +1,86 @@
+<div class="p-4">
+  <form class="flex flex-col gap-6 p-2" [formGroup]="companyForm" (ngSubmit)="handleSubmit()">
+    <div class="flex flex-col gap-2 p-2 w-12/12 max-h-[65vh] overflow-x-auto">
+      <label class="font-bold text-[#283943] uppercase"> Razón social </label>
+      <input type="text" placeholder="Razón Social *"
+        class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+        formControlName="ra_social"
+        [ngClass]="{'border-red-500': companyForm.get('ra_social')?.invalid && companyForm.get('ra_social')?.touched}" />
+      <span *ngIf="companyForm.get('ra_social')?.invalid && companyForm.get('ra_social')?.touched" class="text-red-500">
+        Razón social es obligatoria.
+      </span>
+
+      <label class="font-bold text-[#283943] uppercase"> RUC </label>
+      <input type="number" placeholder="RUC *"
+        class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+        formControlName="ruc"
+        [ngClass]="{'border-red-500': companyForm.get('ruc')?.invalid && companyForm.get('ruc')?.touched}" />
+      <span *ngIf="companyForm.get('ruc')?.invalid && companyForm.get('ruc')?.touched" class="text-red-500">
+        RUC es obligatorio.
+      </span>
+
+
+      <label class="font-bold text-[#283943] uppercase"> Dirección </label>
+      <input type="text" placeholder="Dirección *"
+        class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+        formControlName="address"
+        [ngClass]="{'border-red-500': companyForm.get('address')?.invalid && companyForm.get('address')?.touched}" />
+      <span *ngIf="companyForm.get('address')?.invalid && companyForm.get('address')?.touched" class="text-red-500">
+        Dirección es obligatoria.
+      </span>
+
+
+      <label class="font-bold text-[#283943] uppercase"> Teléfono </label>
+      <input type="number" placeholder="Teléfono *"
+        class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+        formControlName="phone"
+        [ngClass]="{'border-red-500': companyForm.get('phone')?.invalid && companyForm.get('phone')?.touched}" />
+      <span *ngIf="companyForm.get('phone')?.invalid && companyForm.get('phone')?.touched" class="text-red-500">
+        Teléfono es obligatorio.
+      </span>
+
+      <label class="font-bold text-[#283943] uppercase"> Email </label>
+      <input type="email" placeholder="Email *"
+        class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+        formControlName="email"
+        [ngClass]="{'border-red-500': companyForm.get('email')?.invalid && companyForm.get('email')?.touched}" />
+      <span *ngIf="companyForm.get('email')?.invalid && companyForm.get('email')?.touched" class="text-red-500">
+        Ingresa un email válido.
+      </span>
+
+
+
+      <label class="font-bold text-[#283943] uppercase">Estado</label>
+      <select
+        class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+        formControlName="status"
+        [ngClass]="{'border-red-500': companyForm.get('status')?.invalid && companyForm.get('status')?.touched}">
+        <option *ngFor="let option of statusOptions" [value]="option.id">{{ option.nombre }}</option>
+      </select>
+      <span *ngIf="companyForm.get('status')?.invalid && companyForm.get('status')?.touched" class="text-red-500">
+        El estado es obligatorio.
+      </span>
+
+
+      <label class="font-bold text-[#283943] uppercase">Imagen</label>
+      <input type="file"
+        class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+        (change)="onFileChange($event)" />
+
+
+      <div *ngIf="imagePreview" class="mt-2">
+        <p class="text-gray-500">Vista previa:</p>
+        <img [src]="imagePreview" class="border rounded w-32 h-32 object-cover" />
+      </div>
+
+    </div>
+    <div class="flex justify-between px-2 w-12/12">
+      <button class="bg-[#0061A0] py-2 rounded w-5/12 text-white" type="submit" [disabled]="!companyForm.valid"
+        [ngClass]="{'opacity-50 cursor-not-allowed': !companyForm.valid}">
+        {{ company ? 'Actualizar' : 'Crear' }}
+      </button>
+      <button class="py-2 border border-gray-300 rounded w-5/12" (click)="onClose.emit()"
+        type="button">Cancelar</button>
+    </div>
+  </form>
+</div>

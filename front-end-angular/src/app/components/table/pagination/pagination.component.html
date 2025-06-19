@@ -1,0 +1,16 @@
+<div class="pagination">
+  <button (click)="changePage(currentPage - 1)" [disabled]="currentPage <= 1">
+    <fa-icon [icon]="icons.caretLeft " class="font-bold text-md"></fa-icon>
+  </button>
+
+  <ng-container *ngFor="let page of pages">
+    <button *ngIf="page !== '...'" (click)="changePage(page)" [class.active]="page === currentPage"
+      [disabled]="page === '...'">
+      {{ page }}
+    </button>
+    <span *ngIf="page === '...'">...</span>
+  </ng-container>
+
+  <button (click)="changePage(currentPage + 1)" [disabled]="currentPage >= totalPages">
+    <fa-icon [icon]="icons.caretRight " class="font-bold text-md"></fa-icon> </button>
+</div>

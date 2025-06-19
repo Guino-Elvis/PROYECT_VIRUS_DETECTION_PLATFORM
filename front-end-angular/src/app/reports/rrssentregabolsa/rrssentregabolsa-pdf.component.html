@@ -1,0 +1,74 @@
+<div class="flex flex-col justify-center items-center">
+    <div class="rounded-lg max-w-[99vw] overflow-hidden hover:overflow-auto">
+        <div *ngFor="let group of rrssentregabolsas">
+            <h3>{{ group.institutionDetails.name_ib }} (ID: {{ group.institutionId }})</h3>
+            <table
+                class="border border-gray-300 rounded-lg w-full text-left border-separate border-spacing-0 table-auto">
+                <thead class="top-0 z-10 sticky bg-white rounded-t-lg uppercase">
+                    <tr>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">ID</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Institucion</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Codigo Modular</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">programacion</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">N* entrega</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Tipo de bolsa</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Capacidad</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Cantidad</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Archivo</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Es total ?</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr >
+                        {{ group.institutionDetails.programacion }}
+                        <td class="px-4 py-2 border-gray-300 border-b">
+                            <div class="flex">
+                                <span *ngFor="let bolsa of group.institutionData">
+
+                                    <div class="flex flex-col justify-center items-center w-full" [ngClass]="{
+                                      'bg-green-500': bolsa.tipo_bolsa === 'Verde',
+                                      'bg-black': bolsa.tipo_bolsa === 'Negra'
+                                    }">
+                                    <div class="flex flex-row justify-center items-center border w-full text-white">
+                                        {{ bolsa?.institution.name_ib }}
+                                    </div> <div class="flex flex-row justify-center items-center border w-full text-white">
+                                        {{ bolsa.programacion }}
+                                    </div>
+                                        <div class="flex flex-row justify-center items-center border w-full text-white">
+                                            {{ bolsa.tipo_bolsa }}
+                                        </div>
+                                        <div class="flex flex-row justify-center items-center border w-full text-white">
+                                            <ng-container *ngIf="bolsa.entrega_numero === 0; else showEntrega">
+                                                Total
+                                            </ng-container>
+                                            <ng-template #showEntrega>
+                                                Entrega {{ bolsa.entrega_numero }}
+                                            </ng-template>
+                                        </div>
+                                        <div class="flex flex-row justify-center items-center border w-full text-white">
+                                            <samp>{{ bolsa.capacidad }}</samp> <samp>L</samp>
+                                        </div>
+                                        <div
+                                            class="flex flex-row justify-center items-center px-10 py-2 border text-white">
+                                            <samp>{{ bolsa.cantidad }}</samp>
+                                        </div>
+                                    </div>
+
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="pagination">
+            <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Anterior</button>
+            <span>Página {{ currentPage }} de {{ totalPages }}</span>
+            <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">Siguiente</button>
+        </div>
+    </div>
+</div>

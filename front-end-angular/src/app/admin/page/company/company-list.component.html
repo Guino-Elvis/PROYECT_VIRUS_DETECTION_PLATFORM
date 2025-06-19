@@ -1,0 +1,140 @@
+<app-layout title="Company">
+    <app-custom-link icon="ph-file" texto="Company"></app-custom-link>
+
+    <div class="flex justify-center items-center bg-white my-10 px-4 py-4 rounded-md w-auto h-auto">
+        <div class="flex flex-col gap-4 w-full">
+            <app-modal-form [isOpen]="modalOpen" (onClose)="modalOpen = false">
+                <app-company-form [company]="editMode ? companyForm : null" (onSave)="saveCompany($event)"
+                    (onClose)="closeModal()"></app-company-form>
+            </app-modal-form>
+            <div class="flex flex-wrap-reverse justify-between gap-2">
+                <div class="flex flex-wrap-reverse justify-center items-center gap-4">
+                    <div class="relative flex items-center">
+                        <fa-icon [icon]="icons.search " class="left-3 absolute text-gray-400"></fa-icon>
+                        <input
+                            class="bg-transparent py-[0.4800rem] pr-5 pl-10 border border-gray-300 rounded-lg focus-visible:outline-none text-black placeholder-gray-400"
+                            [(ngModel)]="searchText" (input)="filterCompanies()" placeholder="Buscar compañia">
+                    </div>
+                    <div
+                        class="flex flex-row flex-wrap md:flex-nowrap lg:flex-nowrap xl:flex-nowrap justify-start items-start gap-2">
+                        <app-reusable-button [icon]="sortOrder === 'asc' ? icons.arrowDown19 : icons.arrowUp91" text=""
+                            variante="outlined" size="xl" (onClick)="toggleSortOrder()">
+                        </app-reusable-button>
+                        <app-reusable-button [icon]="icons.rotate" text="" variante="outlined" size="xl"
+                            (onClick)="resetFilters()">
+                        </app-reusable-button>
+                        <app-custom-datepicker (dateChange)="updateDates($event)"></app-custom-datepicker>
+                    </div>
+                </div>
+                <app-admin-only>
+                    <app-reusable-button [icon]="icons.add" text="Crear" variante="contained" size="lg"
+                        (onClick)="createCompany()">
+                    </app-reusable-button>
+                </app-admin-only>
+            </div>
+            <div class="rounded-lg max-h-[25rem] overflow-hidden hover:overflow-auto">
+                <table
+                    class="border border-gray-300 rounded-lg w-full text-left border-separate border-spacing-0 table-auto">
+                    <thead class="top-0 z-10 sticky bg-white rounded-t-lg uppercase">
+                        <tr>
+                            <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">ID</th>
+                            <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">LOGO</th>
+                            <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Razon social</th>
+                            <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Ruc</th>
+                            <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Estado</th>
+                            <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Actualizado</th>
+                            <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Creado</th>
+                            <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngIf="companies.length === 0">
+                            <td colspan="7" class="py-4 text-center">
+                                <div class="flex justify-center items-center">
+                                    <app-no-item-page />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngFor="let company of companies">
+                            <td class="px-4 py-2 border-gray-300 border-b">
+                                <div
+                                    class="flex justify-center items-center bg-[#0061A0] rounded-full w-5 h-5 font-bold text-white text-xs">
+                                    {{ company.id }}
+                                </div>
+                            </td>
+                            <td class="px-4 py-2 border-gray-300 border-b">
+                                <img [src]="baseUrl + company.image_url" alt="Imagen de la empresa"
+                                    width="100" />
+                            </td>
+                            <td class="px-4 py-2 border-gray-300 border-b"> {{ company.ra_social }}</td>
+                            <td class="px-4 py-2 border-gray-300 border-b"> {{ company.ruc }}</td>
+                            <td class="px-4 py-2 border-gray-300 border-b">
+                                <div
+                                    class="flex flex-row items-center gap-2 px-1 border border-gray-300 rounded-full w-full">
+                                    <span [ngClass]="{
+                                    'bg-green-500': company.status === '2', 
+                                    'bg-red-500': company.status === '1'
+                                  }" class="rounded-full w-4 h-4">
+                                    </span>
+                                    <h6 [ngClass]="{
+                                    'text-black': company.status === '2', 
+                                    'text-gray-400': company.status === '1'
+                                  }">
+                                        {{ company.status === '2'? 'Activo' : 'Inactivo' }}
+                                    </h6>
+                                </div>
+                            </td>
+                            <td class="px-4 py-2 border-gray-300 border-b">
+                                <app-item-updated-at [updated_at]="company.updated_at ?? null"></app-item-updated-at>
+                            </td>
+                            <td class="px-4 py-2 border-gray-300 border-b">
+                                <app-item-updated-at [updated_at]="company.created_at ?? null"></app-item-updated-at>
+                            </td>
+                            <td class="right-0 sticky flex flex-row gap-4 bg-white px-4 py-4">
+                                <button
+                                    class="bg-gray-100 hover:bg-[#0061A0] px-2.5 py-1 rounded-full text-gray-500 hover:text-white duration-300"
+                                    (click)="editCompany(company)">
+                                    <fa-icon [icon]="icons.penToSquare "></fa-icon>
+                                </button>
+                                <app-admin-only>
+                                    <button
+                                        class="bg-gray-100 hover:bg-red-400 px-2.5 py-1 rounded-full text-gray-500 hover:text-white duration-300"
+                                        (click)="deleteCompany(company.id!)">
+                                        <fa-icon [icon]="icons.trashCan "></fa-icon>
+                                    </button>
+                                </app-admin-only>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex flex-wrap-reverse justify-between">
+
+                <div
+                    class="flex flex-row items-center gap-2.5 px-2 py-[0.0500rem] border border-gray-300 rounded-md text-gray-500 text-sm">
+                    <label for="itemsPerPage">Mostrar</label>
+                    <select
+                        class="px-3 py-0.5 border border-white focus:border-green-700 focus:border-none rounded-md focus:outline-none text-black 1"
+                        id="itemsPerPage" [(ngModel)]="perPage" (change)="updateItemsPerPage(perPage)">
+                        <option value="1">1</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <label for="itemsPerPage">elementos</label>
+                </div>
+
+                <!-- <app-items-per-page-filter [perPage]="perPage" [options]="[1, 10, 25, 50, 100]"
+                    (perPageChange)="updateItemsPerPage($event)">
+                </app-items-per-page-filter> -->
+                <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (pageChange)="changePage($event)">
+                </app-pagination>
+
+            </div>
+        </div>
+    </div>
+
+
+
+</app-layout>

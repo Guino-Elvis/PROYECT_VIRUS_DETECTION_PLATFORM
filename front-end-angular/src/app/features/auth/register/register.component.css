@@ -1,0 +1,56 @@
+.btn-back{
+    background-color: rgba(241, 234, 234, 0.541); /* Transparente */
+    border-radius: 2px;
+    border: solid rgb(255, 255, 255) 1px;
+    backdrop-filter: blur(6px); 
+    -webkit-backdrop-filter: blur(8px); 
+}
+.box-1 {
+    width: 2rem;
+    height: 2rem;
+    background-color: rgba(241, 234, 234, 0.541); /* Transparente */
+    border-radius: 2px;
+    border: solid white 1px;
+    backdrop-filter: blur(6px); 
+    -webkit-backdrop-filter: blur(8px); 
+  }
+  .box-2 {
+    width: 6rem;
+    height: 6rem;
+    background-color: rgba(241, 234, 234, 0.541); /* Transparente */
+    border-radius: 2px;
+    border: solid white 1px;
+    backdrop-filter: blur(6px); 
+    -webkit-backdrop-filter: blur(8px); 
+  }
+
+
+
+  .box-3 {
+    width: 6rem;
+    height: 6rem;
+    background-color: rgba(241, 234, 234, 0.541); /* Transparente */
+    border-radius: 2px;
+    border: solid white 1px;
+    backdrop-filter: blur(6px); 
+    -webkit-backdrop-filter: blur(8px); 
+  }
+  .box-4 {
+    width: 3rem;
+    height: 3rem;
+    background-color: rgba(241, 234, 234, 0.541); /* Transparente */
+    border-radius: 2px;
+    border: solid white 1px;
+    backdrop-filter: blur(6px); 
+    -webkit-backdrop-filter: blur(8px); 
+  }
+
+  .box-5 {
+    width: 5rem;
+    height: 5rem;
+    background-color: rgba(241, 234, 234, 0.541); /* Transparente */
+    border-radius: 2px;
+    border: solid white 1px;
+    backdrop-filter: blur(6px); 
+    -webkit-backdrop-filter: blur(8px); 
+  }

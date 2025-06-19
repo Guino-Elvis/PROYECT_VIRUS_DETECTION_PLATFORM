@@ -1,0 +1,17 @@
+
+  /* Cambiar el color de las opciones del mat-select */
+  .mat-select-value {
+    color: red !important; /* Ajusta el color de las opciones seleccionadas */
+  }
+  
+  /* Cambiar el color del texto del label */
+  .mat-label {
+    color: red; /* Cambia el color del texto de la etiqueta */
+  }
+  
+  /* Estilo para los mat-options */
+  .mat-option {
+    font-size: 12px; /* Ajusta el tamaño de las opciones dentro del select */
+    color: #3498db; /* Cambia el color de las opciones */
+  }
+  

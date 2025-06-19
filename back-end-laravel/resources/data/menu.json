@@ -1,0 +1,33 @@
+[
+  {
+    "icon": "ph-house",
+    "name": "Dashboard",
+    "roles": ["Administrador"],
+    "route": "/welcome"
+  },
+  {
+    "icon": "ph-gear",
+    "name": "Administracion",
+    "submenu": [
+      {
+        "icon": "ph-buildings",
+        "name": "Compañias",
+        "roles": ["Administrador", "Empresa"],
+        "route": "/company"
+      },
+      {
+        "icon": "ph-user-plus",
+        "name": "Usuarios",
+        "roles": ["Administrador", "Empresa"],
+        "route": "/administration-user"
+      }
+    ]
+  },
+  {
+    "icon": "ph-file-text",
+    "name": "Proyectos",
+    "roles": ["Administrador", "Empresa"],
+    "route": "/project"
+  }
+  
+]

@@ -1,0 +1,62 @@
+<div class="p-4">
+    <form class="flex flex-col gap-6 p-2" [formGroup]="projectForm" (ngSubmit)="handleSubmit()">
+
+        <div class="flex flex-col gap-2 p-2 max-h-[65vh] overflow-x-auto">
+
+            <label class="font-bold text-[#283943] uppercase"> Nombre de Proyecto</label>
+            <input type="text" placeholder="Nombre de proyecto *"
+                class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+                formControlName="name"
+                [ngClass]="{'border-red-500': projectForm.get('name')?.invalid && projectForm.get('name')?.touched}" />
+            <span *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched" class="text-red-500">
+                Nombre obligatorio.
+            </span>
+
+            <label class="font-bold text-[#283943] uppercase">Descripción </label>
+            <input type="text" placeholder="Descripción *"
+                class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+                formControlName="description"
+                [ngClass]="{'border-red-500': projectForm.get('description')?.invalid && projectForm.get('description')?.touched}" />
+            <span *ngIf="projectForm.get('description')?.invalid && projectForm.get('description')?.touched"
+                class="text-red-500">
+                Descripción obligatoria.
+            </span>
+
+            <label class="font-bold text-[#283943] uppercase">Url Web *</label>
+            <input type="text" placeholder="Url Web *"
+                class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+                formControlName="target_url"
+                [ngClass]="{'border-red-500': projectForm.get('target_url')?.invalid && projectForm.get('target_url')?.touched}" />
+            <span *ngIf="projectForm.get('target_url')?.invalid && projectForm.get('target_url')?.touched"
+                class="text-red-500">
+                Url Web obligatoria.
+            </span>
+
+            <app-admin-only (adminStatus)="handleAdminStatus($event)">
+                <label class="font-bold text-[#283943] uppercase"> Compañia a la que pertenece el proyecto* </label>
+                <select
+                    class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0 w-full"
+                    formControlName="company_id"
+                    [ngClass]="{'border-red-500': projectForm.get('company_id')?.invalid && projectForm.get('company_id')?.touched}">
+                    <option *ngFor="let company of companyOptions" [value]="company.id">
+                        {{ company.ra_social }}
+                    </option>
+                </select>
+                <span *ngIf="projectForm.get('company_id')?.invalid && projectForm.get('company_id')?.touched"
+                    class="text-red-500">
+                    El Contrato es obligatorio.
+                </span>
+            </app-admin-only>
+
+
+        </div>
+        <div class="flex justify-between px-2 w-12/12">
+            <button class="bg-[#0061A0] py-2 rounded w-5/12 text-white" type="submit" [disabled]="!projectForm.valid"
+                [ngClass]="{'opacity-50 cursor-not-allowed': !projectForm.valid}">
+                {{ project ? 'Actualizar' : 'Crear' }}
+            </button>
+            <button class="py-2 border border-gray-300 rounded w-5/12" (click)="onClose.emit()"
+                type="button">Cancelar</button>
+        </div>
+    </form>
+</div>
