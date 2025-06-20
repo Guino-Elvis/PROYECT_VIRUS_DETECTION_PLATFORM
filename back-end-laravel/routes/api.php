@@ -34,7 +34,8 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('projects', ApiProjectController::class)->middleware('can:admin.projects');
     Route::apiResource('key_projects', ApiKeyKeyProjectController::class)->middleware('can:admin.key.projects');
     Route::apiResource('scans', ApiScanController::class)->middleware('can:admin.scans');
-    
+    Route::get('scans_progress/{id}', [ApiScanController::class, 'getScanProgress']);
+
     Route::apiResource('vulneravilities', ApiVulnerabilityController::class)->middleware('can:admin.vulneravilitiess');
 
 

@@ -14,6 +14,8 @@ class Scan extends Model
         'key_project_id',
         'zap_scan_id',
         'status',
+        'progress',
+        'error_message',
         'started_at',
         'finished_at',
         'results',

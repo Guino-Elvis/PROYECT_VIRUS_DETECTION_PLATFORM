@@ -19,6 +19,8 @@ return new class extends Migration
             $table->foreign('key_project_id')->references('id')->on('key_projects')->onDelete('cascade');
             $table->string('zap_scan_id')->nullable();
             $table->enum('status', ['pending', 'running', 'completed', 'failed'])->default('pending');
+            $table->integer('progress')->default(0)->nullable(); // 0 a 100
+            $table->text('error_message')->nullable();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('finished_at')->nullable();
             $table->json('results')->nullable(); 

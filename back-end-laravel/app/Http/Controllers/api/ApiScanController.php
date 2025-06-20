@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\ApiScanRequest;
+use App\Jobs\RunZapScanJob;
 use App\Models\KeyProject;
 use App\Models\Project;
 use App\Models\Scan;
@@ -15,6 +16,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class ApiScanController extends Controller
 {
@@ -76,135 +78,195 @@ class ApiScanController extends Controller
     }
 
 
+    // public function store(Request $request)
+    // {
+    //     DB::beginTransaction();
+
+    //     try {
+    //         $projectId = $request->input('project_id');
+    //         $project = Project::findOrFail($projectId);
+
+    //         $keyProject = KeyProject::where('project_id', $project->id)
+    //             ->where('active', true)
+    //             ->where(function ($query) {
+    //                 $query->whereNull('expires_at')
+    //                     ->orWhere('expires_at', '>', now());
+    //             })->first();
+
+    //         if (!$keyProject) {
+    //             return response()->json([
+    //                 'error' => 'El proyecto no tiene una clave activa o está expirada',
+    //             ], 422);
+    //         }
+
+    //         $zapUrl = config('zap.api_url');
+    //         $apiKey = config('zap.api_key');
+    //         $target = $project->target_url;
+
+    //         // Incluir en contexto para evitar errores comunes
+    //         Http::get("$zapUrl/JSON/context/action/includeInContext", [
+    //             'contextName' => 'Default Context',
+    //             'regex'       => $target . '.*',
+    //             'apikey'      => $apiKey,
+    //         ]);
+
+    //         // --- SPIDER ---
+    //         $spiderResponse = Http::get("$zapUrl/JSON/spider/action/scan", [
+    //             'url'    => $target,
+    //             'apikey' => $apiKey,
+    //         ]);
+
+    //         $spiderScanId = $spiderResponse['scan'] ?? null;
+    //         if (!$spiderScanId) {
+    //             Log::error('Spider error response', $spiderResponse->json());
+    //             throw new \Exception("No se pudo iniciar el spidering en ZAP.");
+    //         }
+
+    //         do {
+    //             sleep(5);
+    //             $statusSpider = Http::get("$zapUrl/JSON/spider/view/status", [
+    //                 'scanId' => $spiderScanId,
+    //                 'apikey' => $apiKey,
+    //             ]);
+    //             $spiderProgress = (int) ($statusSpider['status'] ?? 0);
+    //         } while ($spiderProgress < 100);
+
+    //         // --- ESCANEO ACTIVO ---
+    //         $scanResponse = Http::get("$zapUrl/JSON/ascan/action/scan", [
+    //             'url'          => $target,
+    //             'recurse'      => true,
+    //             'inScopeOnly'  => false,
+    //             'apikey'       => $apiKey,
+    //         ]);
+
+    //         $scanData = $scanResponse->json();
+    //         $zapScanId = $scanData['scan'] ?? null;
+
+    //         if (!$zapScanId) {
+    //             Log::error('Active scan error response', $scanData);
+    //             throw new \Exception("No se pudo iniciar el escaneo activo en ZAP.");
+    //         }
+
+    //         $startedAt = now();
+
+    //         do {
+    //             sleep(5);
+    //             $statusCheck = Http::get("$zapUrl/JSON/ascan/view/status", [
+    //                 'scanId' => $zapScanId,
+    //                 'apikey' => $apiKey,
+    //             ]);
+    //             $progress = (int) ($statusCheck['status'] ?? 0);
+    //         } while ($progress < 100);
+
+    //         $finishedAt = now();
+
+    //         // --- ALERTAS ---
+    //         $alertsResponse = Http::get("$zapUrl/JSON/core/view/alerts", [
+    //             'baseurl' => $target,
+    //             'start'   => 0,
+    //             'count'   => 1000,
+    //             'apikey'  => $apiKey,
+    //         ]);
+
+    //         $alerts = $alertsResponse['alerts'] ?? [];
+
+    //         // --- GUARDAR RESULTADO ---
+    //         $scan = Scan::create([
+    //             'project_id'     => $project->id,
+    //             'key_project_id' => $keyProject->id,
+    //             'zap_scan_id'    => $zapScanId,
+    //             'status'         => 'completed',
+    //             'started_at'     => $startedAt,
+    //             'finished_at'    => $finishedAt,
+    //             'results'        => $alerts,
+    //         ]);
+
+    //         foreach ($alerts as $alert) {
+    //             Vulnerability::create([
+    //                 'scan_id'    => $scan->id,
+    //                 'plugin_id'  => $alert['pluginId'] ?? '',
+    //                 'name'       => $alert['name'] ?? '',
+    //                 'risk'       => $alert['risk'] ?? 'Informational',
+    //                 'confidence' => $alert['confidence'] ?? 'Medium',
+    //                 'description' => $alert['description'] ?? '',
+    //                 'url'        => $alert['url'] ?? '',
+    //                 'parameter'  => $alert['param'] ?? '',
+    //                 'solution'   => $alert['solution'] ?? '',
+    //                 'evidence'   => $alert['evidence'] ?? '',
+    //             ]);
+    //         }
+
+    //         DB::commit();
+
+    //         return response()->json([
+    //             'message' => 'Escaneo completado con éxito',
+    //             'scan'    => $scan->load('vulnerabilities'),
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Error en escaneo ZAP', [
+    //             'message' => $e->getMessage(),
+    //             'trace'   => $e->getTraceAsString(),
+    //         ]);
+    //         return response()->json([
+    //             'error'   => 'Error durante el escaneo',
+    //             'details' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
+
+
     public function store(Request $request)
     {
-        DB::beginTransaction();
+        $projectId = $request->input('project_id');
 
-        try {
-            $projectId = $request->input('project_id');
-            $project = Project::findOrFail($projectId);
+        $keyProject = KeyProject::where('project_id', $projectId)
+            ->where('active', true)
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->first();
 
-            $keyProject = KeyProject::where('project_id', $project->id)
-                ->where('active', true)
-                ->where(function ($query) {
-                    $query->whereNull('expires_at')
-                        ->orWhere('expires_at', '>', Carbon::now());
-                })
-                ->first();
-
-            if (!$keyProject) {
-                return response()->json([
-                    'error' => 'El proyecto no tiene una clave activa o está expirada',
-                ], 422);
-            }
-
-            $zapUrl = config('zap.api_url');
-            $apiKey = config('zap.api_key');
-            $target = $project->target_url;
-
-            // 1. SPIDER primero (muy importante)
-            $spiderResponse = Http::get("$zapUrl/JSON/spider/action/scan", [
-                'url' => $target,
-                'apikey' => $apiKey,
-            ]);
-
-            $spiderScanId = $spiderResponse['scan'] ?? null;
-            if (!$spiderScanId) {
-                throw new \Exception("No se pudo iniciar el spidering en ZAP.");
-            }
-
-            do {
-                sleep(5);
-                $statusSpider = Http::get("$zapUrl/JSON/spider/view/status", [
-                    'scanId' => $spiderScanId,
-                    'apikey' => $apiKey,
-                ]);
-                $spiderProgress = (int) ($statusSpider['status'] ?? 0);
-            } while ($spiderProgress < 100);
-
-            // 2. Escaneo activo
-            $scanResponse = Http::withHeaders([
-                'Accept' => 'application/json',
-            ])->get("$zapUrl/JSON/ascan/action/scan", [
-                'url' => $target,
-                'recurse' => true,
-                'inScopeOnly' => false,
-                'apikey' => $apiKey,
-            ]);
-
-
-            $scanData = $scanResponse->json();
-            $zapScanId = $scanData['scan'] ?? null;
-
-            if (!$zapScanId) {
-                throw new \Exception("No se pudo iniciar el escaneo activo en ZAP.");
-            }
-
-            $startedAt = now();
-
-            do {
-                sleep(5);
-                $statusCheck = Http::get("$zapUrl/JSON/ascan/view/status", [
-                    'scanId' => $zapScanId,
-                    'apikey' => $apiKey,
-                ]);
-                $progress = (int) ($statusCheck['status'] ?? 0);
-            } while ($progress < 100);
-
-            $finishedAt = now();
-
-            // 3. Obtener vulnerabilidades (alertas)
-            $alertsResponse = Http::get("$zapUrl/JSON/core/view/alerts", [
-                'baseurl' => $target,
-                'start' => 0,
-                'count' => 1000,
-                'apikey' => $apiKey,
-            ]);
-
-            $alerts = $alertsResponse['alerts'] ?? [];
-
-            // 4. Guardar en DB
-            $scan = Scan::create([
-                'project_id'     => $project->id,
-                'key_project_id' => $keyProject->id,
-                'zap_scan_id'    => $zapScanId,
-                'status'         => 'completed',
-                'started_at'     => $startedAt,
-                'finished_at'    => $finishedAt,
-                'results'        => $alerts,
-            ]);
-
-            foreach ($alerts as $alert) {
-                Vulnerability::create([
-                    'scan_id'    => $scan->id,
-                    'plugin_id'  => $alert['pluginId'] ?? '',
-                    'name'       => $alert['name'] ?? '',
-                    'risk'       => $alert['risk'] ?? 'Informational',
-                    'confidence' => $alert['confidence'] ?? 'Medium',
-                    'description' => $alert['description'] ?? '',
-                    'url'        => $alert['url'] ?? '',
-                    'parameter'  => $alert['param'] ?? '',
-                    'solution'   => $alert['solution'] ?? '',
-                    'evidence'   => $alert['evidence'] ?? '',
-                ]);
-            }
-
-            DB::commit();
-
+        if (!$keyProject) {
             return response()->json([
-                'message' => 'Escaneo completado con éxito',
-                'scan'    => $scan->load('vulnerabilities'),
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'error' => 'Error durante el escaneo',
-                'details' => $e->getMessage(),
-            ], 500);
+                'error' => 'El proyecto no tiene una clave activa válida.'
+            ], 400);
         }
+
+        $scan = Scan::create([
+            'project_id'     => $projectId,
+            'key_project_id' => $keyProject->id,
+            'status'         => 'pending',
+            'progress'       => 0,
+        ]);
+
+        dispatch(new RunZapScanJob($scan->id));
+
+        return response()->json([
+            'message' => 'Escaneo iniciado en segundo plano.',
+            'scan_id' => $scan->id
+        ]);
     }
 
+    public function getScanProgress($id)
+    {
+        $scan = Scan::find($id);
 
+        if (!$scan) {
+            return response()->json([
+                'error' => 'Scan no encontrado'
+            ], 404);
+        }
+
+        return response()->json([
+            'status'   => $scan->status,
+            'progress' => $scan->progress,
+            'started_at' => $scan->started_at,
+            'finished_at' => $scan->finished_at,
+        ]);
+    }
 
 
     public function show($id)
